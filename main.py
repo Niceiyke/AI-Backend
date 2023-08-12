@@ -104,7 +104,7 @@ def AI_business_name_generator(detail:BusinessName):
 
     load_dotenv()
 
-    template = """List 10 captivating and innovative name  suitable for a business with this list of Keywords:"{keywords}" and in the "{industry}" industy.return only the names and nothing else. \n\n {format_instructions}"""
+    template = """List 20 uqnuie business name in the "{industry}" industy, with this list of Keywords:"{keywords}" .return only the names and nothing else. \n\n {format_instructions}"""
 
     prompt = ChatPromptTemplate(
        messages=[HumanMessagePromptTemplate.from_template(template=template)],
@@ -148,7 +148,7 @@ def generate_sql_code(text:SqlGenerator):
 def generate_prompt(detail:PromptGenerator):
     load_dotenv()
 
-    template = """your a helpful prompt design specialist ,give me  a perfect  prompt for generating this : "{detail}". in your response always indicate what has to be modified if any. return only the generated prompt and nothing else. """
+    template = """your a helpful CHATGPT prompt specialist, create prompt for this task: "{detail}".indicate what has to be modified if any. return only the generated prompt and nothing else. """
 
     prompt = PromptTemplate(
         input_variables=["detail"], template=template
