@@ -24,8 +24,8 @@ origins = [
     "http://localhost:3000",
     "http://localhost:4173/",
     "https://saas-foo.vercel.app",
-    "https://saas-frontend-ruby.vercel.app",
-    "https://saas-frontend-niceiyke.vercel.app"
+    "https://ai-frontend-beta.vercel.app",  "https://saas-frontend-ruby.vercel.app",
+"https://saas-frontend-niceiyke.verce.app"
 ]
 
 app.add_middleware(
