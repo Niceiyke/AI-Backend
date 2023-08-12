@@ -33,7 +33,7 @@ def read_root():
 def chat(message:Chat):
     load_dotenv()
 
-    llm = ChatOpenAI()
+    llm = ChatOpenAI(temperature=1)
     chain = ConversationChain(llm=llm)
     answer = chain.predict(input=message.message)
     return answer
