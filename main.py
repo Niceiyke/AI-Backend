@@ -1,9 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List
 from dotenv import load_dotenv
-
 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain,LLMChain
@@ -11,22 +8,11 @@ from langchain.prompts import PromptTemplate,ChatPromptTemplate,HumanMessageProm
 from langchain.output_parsers import CommaSeparatedListOutputParser
 
 from services import get_youtube_transcript
-
-
+from model import Translate,SqlGenerator,Summerize,PromptGenerator,BusinessName,Chat
+from settings import origins
 
 
 app = FastAPI()
-
-origins = [
-
-    "http://localhost:5173",
-    "http://localhost:8080",
-    "http://localhost:3000",
-    "http://localhost:4173/",
-    "https://saas-foo.vercel.app",
-    "https://ai-frontend-beta.vercel.app",  "https://saas-frontend-ruby.vercel.app",
-"https://saas-frontend-niceiyke.verce.app"
-]
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,35 +24,19 @@ app.add_middleware(
 
 # Set up OpenAI API credentials
 
-
-class Translate(BaseModel):
-    message:str
-    from_language:str
-    to_language:str
-
-class Summerize(BaseModel):
-    youtube_url:str
-
-class BusinessName(BaseModel):
-    keyword:List[str]
-    industry:str
-class PromptGenerator(BaseModel):
-    detail:str
-class SqlGenerator(BaseModel):
-    detail:str
 @app.get("/")
 def read_root():
     return {"answer": "welcome to my AI build"}
 
 
 @app.post("/api/chat")
-def chat(question: str):
+def chat(message:Chat):
     load_dotenv()
 
     llm = ChatOpenAI()
     chain = ConversationChain(llm=llm)
-    answer = chain.predict(input=question)
-    return {"answer": answer}
+    answer = chain.predict(input=message.message)
+    return answer
 
 
 @app.post("/api/translate")
