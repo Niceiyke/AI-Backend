@@ -41,8 +41,9 @@ def generate_summary(text:str)->str:
             summary=chain.run(text=text)
             all_summary+=summary
         
-         with open(f'{all_summary[:20]}.txt','w') as file:
-                file.write(all_summary)
+         #with open(f'{all_summary[:20]}.txt','w') as file:
+                #file.write(all_summary)
+            
                 
     else:
            print('low token to be used')
@@ -60,8 +61,8 @@ def generate_summary(text:str)->str:
            summary=chain.run(text=text)
            all_summary+=summary
         
-           with open(f'{all_summary[:20]}.txt','w') as file:
-                file.write(all_summary)
+           #with open(f'{all_summary[:20]}.txt','w') as file:
+                #file.write(all_summary)
 
     return all_summary
 
