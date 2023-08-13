@@ -33,8 +33,12 @@ def read_root():
 def chat(message:Chat):
     load_dotenv()
 
+    template=""" your are a pastor advive me based on this:"{detail}" """
+
+    prompt =PromptTemplate(input_variables=['detail'],template=template)
+
     llm = ChatOpenAI(temperature=1)
-    chain = ConversationChain(llm=llm)
+    chain = ConversationChain(llm=llm,prompt=prompt)
     answer = chain.predict(input=message.message)
     return answer
 
@@ -118,7 +122,7 @@ def generate_sql_code(text:SqlGenerator):
 def generate_prompt(detail:PromptGenerator):
     load_dotenv()
 
-    template = """your a helpful CHATGPT prompt specialist, create prompt for this task: "{detail}".indicate what has to be modified if any. return only the generated prompt and nothing else. """
+    template = """your a prompt design specialist, create prompt for a task with this detail: "{detail}".return only the generated prompt and nothing else. """
 
     prompt = PromptTemplate(
         input_variables=["detail"], template=template
