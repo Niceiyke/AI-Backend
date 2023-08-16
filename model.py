@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,FilePath
 from typing import List
 
 class Translate(BaseModel):
@@ -18,4 +18,10 @@ class SqlGenerator(BaseModel):
     detail:str
 
 class Chat(BaseModel):
+    message:List[str]
+
+class PDFCHAT(BaseModel):
     message:str
+
+class PDFFILE(BaseModel):
+    file:FilePath

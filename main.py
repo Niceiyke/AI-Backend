@@ -1,14 +1,20 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
+import pinecone
+from langchain.vectorstores.pinecone import Pinecone
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain,LLMChain
+from langchain.chains import LLMChain,RetrievalQA
 from langchain.prompts import PromptTemplate,ChatPromptTemplate,HumanMessagePromptTemplate
 from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain.schema   import SystemMessage,HumanMessage
 
-from services import get_youtube_transcript
-from model import Translate,SqlGenerator,Summerize,PromptGenerator,BusinessName,Chat
+from services import get_youtube_transcript,convert_pdf_vector
+from model import Translate,SqlGenerator,Summerize,PromptGenerator,BusinessName,Chat,PDFCHAT,PDFFILE
 from settings import origins
 
 
@@ -29,19 +35,34 @@ def read_root():
     return {"answer": "welcome to my AI build"}
 
 
+
+@app.post("/api/chat_pdf")
+def chat_pdf(text:PDFCHAT):
+    load_dotenv()
+    llm =ChatOpenAI()
+    embeddings=OpenAIEmbeddings()
+
+
+    pinecone.init(api_key=os.getenv("PINECONE_API_KEY"), environment=os.getenv("PINECONE_ENVIRONMENT"))
+
+    
+    vectorstore=Pinecone.from_existing_index(index_name=os.getenv("PINECONE_INDEX_NAME"),embedding=embeddings)
+
+    qa=RetrievalQA.from_chain_type(llm=llm,chain_type="stuff", retriever=vectorstore.as_retriever())
+
+    response =qa.run(text.message)
+
+    return response
+
+
 @app.post("/api/chat")
 def chat(message:Chat):
     load_dotenv()
 
-    template=""" your are a pastor advive me based on this:"{detail}" """
-
-    prompt =PromptTemplate(input_variables=['detail'],template=template)
-
-    llm = ChatOpenAI(temperature=1)
-    chain = ConversationChain(llm=llm,prompt=prompt)
-    answer = chain.predict(input=message.message)
-    return answer
-
+    llm=ChatOpenAI(temperature=0.6)
+    print("message:",message.message)
+    response=llm.predict_messages(messages=message.message)
+    return response
 
 @app.post("/api/translate")
 def translate(detail:Translate):
@@ -132,5 +153,12 @@ def generate_prompt(detail:PromptGenerator):
     chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
 
     response = chain.run(detail=detail.detail)
+
+    return response
+
+
+@app.post("/api/convert_pdf")
+def pdf_to_vector(pdf:PDFFILE):
+    response= convert_pdf_vector(pdf=pdf.file)
 
     return response

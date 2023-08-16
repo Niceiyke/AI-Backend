@@ -1,9 +1,14 @@
-import asyncio
+import os
+import sys
 import tiktoken
+import pinecone
+from dotenv import load_dotenv
 from typing import List
-from langchain.document_loaders import YoutubeLoader
+from langchain.document_loaders import YoutubeLoader,PyPDFLoader
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain,LLMChain
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores.pinecone import Pinecone
+from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import CharacterTextSplitter,TokenTextSplitter
 
@@ -86,3 +91,30 @@ def calculate_text_token(text:str,model:str)->int:
      tokens_integer=len(encoding.encode(text))
      #print(f"{len(tokens_integer)} is the number of tokens in my text")
      return tokens_integer
+
+
+
+def convert_pdf_vector(pdf):
+     
+     load_dotenv()
+     
+     pdf=os.path.abspath(pdf)
+     loader=PyPDFLoader(pdf)
+     docs=loader.load_and_split()
+     print(sys.getrecursionlimit())
+
+     sys.setrecursionlimit(1500)
+
+     print(sys.getrecursionlimit())
+
+
+
+     embeddings=OpenAIEmbeddings()
+
+     pinecone.init(api_key=os.getenv("PINECONE_API_KEY"), environment=os.getenv("PINECONE_ENVIRONMENT"))
+
+     vector=Pinecone.from_documents(documents=docs,embedding=embeddings,index_name=os.getenv("PINECONE_INDEX_NAME"))
+
+    
+
+     return vector
